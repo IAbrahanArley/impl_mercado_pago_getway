@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MercadoPagoService {
@@ -25,10 +27,20 @@ public class MercadoPagoService {
 
 
     public String createCheckout() throws MPException, MPApiException{
-
+/*
         MercadoPagoConfig.setAccessToken("TEST-2453313229452572-092911-e2a5b87ac71ba0c577c887a3ee599639-1160953381");
         MercadoPagoConfig.setIntegratorId("dev_24c65fb163bf11ea96500242ac130004");
-
+        System.out.println(MercadoPagoConfig.getAccessToken());*/
+        Map<String, String> customHeaders = new HashMap<>();
+        customHeaders.put("x-idempotency-key", "...");
+        MPRequestOptions requestOptions =
+                MPRequestOptions.builder()
+                        .accessToken("TEST-2453313229452572-092911-e2a5b87ac71ba0c577c887a3ee599639-1160953381")
+                        .connectionRequestTimeout(2000)
+                        .connectionTimeout(2000)
+                        .socketTimeout(2000)
+                        .customHeaders(customHeaders)
+                        .build();
         PreferenceRequest preferenceRequest = PreferenceRequest.builder()
                 .items(createItems())
                 .payer(createPayer())
@@ -51,7 +63,7 @@ public class MercadoPagoService {
                 .binaryMode(true)
                 .build();
         PreferenceClient client = new PreferenceClient();
-        Preference resultset = client.create(preferenceRequest);
+        Preference resultset = client.create(preferenceRequest, requestOptions);
 
         // Printa o url do pagamento
         System.out.println(resultset.getInitPoint());
@@ -86,13 +98,9 @@ public class MercadoPagoService {
                         .areaCode("83")
                         .number("991754322")
                         .build())
-                .identification(IdentificationRequest.builder()
-                        .type("CPF")
-                        .number("12345678909")
-                        .build())
                 .address(AddressRequest.builder()
                         .streetName("Rua Falsa 123")
-                        .zipCode("58000-000")
+                        .zipCode("58000000")
                         .build())
                 .build();
 

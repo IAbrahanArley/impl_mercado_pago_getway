@@ -14,7 +14,7 @@ public class MercadoPagoController {
     @Autowired
     private MercadoPagoService paymentService;
 
-    @GetMapping
+    @PostMapping("/create")
     public ResponseEntity<String> createPaymentPreference() throws MPException, MPApiException{
         return ResponseEntity.ok().body(paymentService.createCheckout());
     }
@@ -37,6 +37,7 @@ public class MercadoPagoController {
     public ResponseEntity<Void> handleWebhookNotification(@RequestBody String payload) {
 
         System.out.println(payload);
+
 
         return ResponseEntity.ok().build();
     }
